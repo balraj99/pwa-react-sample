@@ -16,10 +16,13 @@
  * limitations under the License
  */
 
-const installButton = document.getElementById('butInstall');
+
 let deferredInstallPrompt;
 
 export const startInstallProcess = () => {
+
+  // console.log('Hello in Start');
+  const installButton = document.getElementById('butInstall');
 
   window.addEventListener('beforeinstallprompt', (e) => {
     console.debug('Before Install', e);
@@ -30,35 +33,36 @@ export const startInstallProcess = () => {
     deferredInstallPrompt = e;
     installButton.removeAttribute('hidden');
   });
+
+  installButton.addEventListener('click', (e) => {
+    // hide our user interface that shows our A2HS button
+    installButton.style.display = 'none';
+    // Show the prompt
+    deferredInstallPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    deferredInstallPrompt.userChoice
+      .then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        } else {
+          console.log('User dismissed the A2HS prompt');
+        }
+        deferredInstallPrompt = null;
+      });
+  });
+
+  // CODELAB: Add event listener for appinstalled event
+  window.addEventListener('appinstalled', logAppInstalled);
+
+  /**
+   * Event handler for appinstalled event.
+   *   Log the installation to analytics or save the event somehow.
+   *
+   * @param {Event} evt
+   */
+  function logAppInstalled(evt) {
+    // CODELAB: Add code to log the event
+    console.log('Weather App was installed.', evt);
+  }
 }
 
-installButton.addEventListener('click', (e) => {
-  // hide our user interface that shows our A2HS button
-  installButton.style.display = 'none';
-  // Show the prompt
-  deferredInstallPrompt.prompt();
-  // Wait for the user to respond to the prompt
-  deferredInstallPrompt.userChoice
-    .then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the A2HS prompt');
-      } else {
-        console.log('User dismissed the A2HS prompt');
-      }
-      deferredInstallPrompt = null;
-    });
-});
-
-// CODELAB: Add event listener for appinstalled event
-window.addEventListener('appinstalled', logAppInstalled);
-
-/**
- * Event handler for appinstalled event.
- *   Log the installation to analytics or save the event somehow.
- *
- * @param {Event} evt
- */
-function logAppInstalled(evt) {
-  // CODELAB: Add code to log the event
-  console.log('Weather App was installed.', evt);
-}
