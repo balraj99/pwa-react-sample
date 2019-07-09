@@ -1,45 +1,58 @@
 import React from 'react';
-// import logo from './logo.svg';
-import './App.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { startInstallProcess } from './install';
 import { HashRouter, Route, Link } from "react-router-dom";
+// import injectSheet, { jss, ThemeProvider } from "react-jss";
 
-const handleFiles = (e) => {
-  const files = e.nativeEvent.target.files;
-  console.debug('Files ', files, e.nativeEvent);
+const theme = {
+  background: "#f7df1e",
+  color: "#24292e"
 };
 
-function App() {
+const styles = {
+  root: {
+    background: '#000'
+  }
+}
+
+const handleFiles = (e, updateFiles) => {
+  const files = e.nativeEvent.target.files;
+  updateFiles(`${files.length} Selected`);
+};
+
+const App = (props) => {
 
   useEffect(() => {
-    console.log('Hello')
     startInstallProcess();
   });
 
+  const [filesSelected, updateFiles] = useState('Upload Files');
+
+  const {
+    classes
+  } = props;
+
   return (
-    // <div className="App">
-    //   <header className="App-header">
-    //     <img src={logo} className="App-logo" alt="logo" />
-    //     <p>
-    //       Edit <code>src/App.js</code> and save to reload.
-    //     </p>
-    //     <a
-    //       className="App-link"
-    //       href="https://reactjs.org"
-    //       target="_blank"
-    //       rel="noopener noreferrer"
-    //     >
-    //       Learn React
-    //     </a>
-    //   </header>
-    // </div>
     <HashRouter basename="/">
-      <div>
-        <div>
-          <header class="header">
-            <h1>
-              <a href="https://darksky.net/poweredby/" class="powered-by">
+
+
+      <div style={{
+        // fontFamily: 'Arial, Helvetica, sans-serif !important',
+        background: '#212121'
+      }}>
+        <div style={{
+          padding: 2,
+          background: 'rgba(0, 0, 0, 0.2)',
+          boxShadow: '0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 2px 9px 1px rgba(0, 0, 0, 0.12), 0 4px 2px -2px rgba(0, 0, 0, 0.2)'
+        }}>
+          <header>
+            <h1 style={{
+              textAlign: 'center'
+            }}>
+              <a href="/" style={{
+                textDecoration: 'none',
+                color: 'white'
+              }}>
                 Mpowered
           </a>
             </h1>
@@ -48,19 +61,33 @@ function App() {
         </div>
         <div style={{
           position: 'fixed',
-          top: '50%'
+          top: '50%',
+          margin: 8
         }}
         >
-          <input
-            type="file"
-            onChange={handleFiles}
-            multiple
-
-          />
+          <div class="input-container">
+            <input type="file" id="real-input" onChange={(e) => handleFiles(e, updateFiles)} />
+            <button
+              class="browse-btn"
+              onClick={(e) => document.getElementById('real-input').click()}
+            >
+              Browse Files
+            </button>
+            <span
+              class="file-info"
+              style={{
+                padding: 4,
+                color: '#000'
+              }}
+            >
+              {filesSelected}
+            </span>
+          </div>
         </div>
       </div>
-    </HashRouter>
+
+    </HashRouter >
   );
 }
 
-export default App;
+export default (App);

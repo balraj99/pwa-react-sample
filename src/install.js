@@ -43,9 +43,9 @@ export const startInstallProcess = () => {
     deferredInstallPrompt.userChoice
       .then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the A2HS prompt');
+          // console.log('User accepted the A2HS prompt');
         } else {
-          console.log('User dismissed the A2HS prompt');
+          // console.log('User dismissed the A2HS prompt');
         }
         deferredInstallPrompt = null;
       });
@@ -60,9 +60,9 @@ export const startInstallProcess = () => {
    *
    * @param {Event} evt
    */
-  function logAppInstalled(evt) {
+  function logAppInstalled(ev) {
     // CODELAB: Add code to log the event
-    console.log('Weather App was installed.', evt);
+    console.debug('App Installed', ev);
   }
 }
 

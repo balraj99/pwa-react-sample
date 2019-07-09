@@ -3,14 +3,14 @@
 
 <head>
   <meta charset="utf-8" />
-  <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+  <link rel="shortcut icon" href="/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <link rel="manifest" href="/manifest.json" />
   <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -21,9 +21,53 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
   <title>React App</title>
+  <style>
+    .input-container {
+      margin: 3em auto;
+      max-width: 300px;
+      background-color: #EDEDED;
+      border: 1px solid #DFDFDF;
+      border-radius: 5px;
+    }
+
+    input[type='file'] {
+      display: none;
+    }
+
+    .file-info {
+      font-size: 0.9em;
+    }
+
+    .browse-btn {
+      background: #03A595;
+      color: #fff;
+      min-height: 35px;
+      padding: 10px;
+      border: none;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+    }
+
+    .browse-btn:hover {
+      background: #4ec0b4;
+    }
+
+    @media (max-width: 300px) {
+      button {
+        width: 100%;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 0;
+      }
+
+      .file-info {
+        display: block;
+        margin: 10px 5px;
+      }
+    }
+  </style>
 </head>
 
-<body>
+<body style="font-family: Arial, Helvetica, sans-serif !important; background: #212121; color: #fff; margin: 0px; ">
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <!-- <button id="a" aria-label="Install">Hello</button> -->
   <div id="root"></div>
