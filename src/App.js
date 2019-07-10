@@ -2,7 +2,8 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { startInstallProcess } from './install';
 import { HashRouter, Route, Link } from "react-router-dom";
-// import injectSheet, { jss, ThemeProvider } from "react-jss";
+import Camera from './Camera';
+import { Button } from '@material-ui/core';
 
 const theme = {
   background: "#f7df1e",
@@ -15,7 +16,7 @@ const styles = {
   }
 }
 
-const handleFiles = (e, updateFiles) => {
+const handleFiles = e => (updateFiles) => {
   const files = e.nativeEvent.target.files;
   updateFiles(`${files.length} Selected`);
 };
@@ -27,49 +28,77 @@ const App = (props) => {
   });
 
   const [filesSelected, updateFiles] = useState('Upload Files');
+  const [openCamera, toggleCamera] = useState(false);
+  const [captureDataURL, updateCaptureDataURL] = useState(null);
 
   const {
     classes
   } = props;
 
   return (
-    <HashRouter basename="/">
-
-
+    <div style={{
+      // fontFamily: 'Arial, Helvetica, sans-serif !important',
+      background: '#212121',
+      height: '100%'
+    }}>
       <div style={{
-        // fontFamily: 'Arial, Helvetica, sans-serif !important',
-        background: '#212121'
+        padding: 2,
+        background: 'rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 2px 9px 1px rgba(0, 0, 0, 0.12), 0 4px 2px -2px rgba(0, 0, 0, 0.2)'
       }}>
-        <div style={{
-          padding: 2,
-          background: 'rgba(0, 0, 0, 0.2)',
-          boxShadow: '0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 2px 9px 1px rgba(0, 0, 0, 0.12), 0 4px 2px -2px rgba(0, 0, 0, 0.2)'
-        }}>
-          <header>
-            <h1 style={{
-              textAlign: 'center'
+        <header>
+          <h1 style={{
+            textAlign: 'center'
+          }}>
+            <a href="/" style={{
+              textDecoration: 'none',
+              color: 'white'
             }}>
-              <a href="/" style={{
-                textDecoration: 'none',
-                color: 'white'
-              }}>
-                Mpowered
+              Mpowered
           </a>
-            </h1>
-            <button id="butInstall" aria-label="Install MPowered" hidden>Install MPowered</button>
-          </header>
-        </div>
+          </h1>
+          <button id="butInstall" aria-label="Install MPowered" hidden>Install MPowered</button>
+        </header>
+      </div>
+      {
+        !captureDataURL && !openCamera && (
+          <div style={{
+            width: '100%',
+            height: '400px',
+            background: 'transparent',
+            textAlign: 'center',
+            color: '#fff'
+          }}>
+            Captured Image Here
+          </div>
+        )
+      }
+      {captureDataURL && !openCamera && (
+        <img
+          src={captureDataURL}
+          alt={'Image'}
+        />)
+      }
+      {openCamera ?
         <div style={{
-          position: 'fixed',
-          top: '50%',
-          margin: 8
+          width: '100%',
+          'height': openCamera ? '100%' : '70%'
+        }}>
+          <Camera onCapture={(captureDataURL) => { updateCaptureDataURL(captureDataURL); toggleCamera(!openCamera) }} />
+        </div>
+        :
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          margin: 8,
+          height: '15%'
         }}
         >
-          <div class="input-container">
+          {/* <div class="input-container">
             <input type="file" id="real-input" onChange={(e) => handleFiles(e, updateFiles)} />
             <button
               class="browse-btn"
-              onClick={(e) => document.getElementById('real-input').click()}
+              onClick={handleFiles(updateFiles)}
             >
               Browse Files
             </button>
@@ -77,17 +106,32 @@ const App = (props) => {
               class="file-info"
               style={{
                 padding: 4,
-                color: '#000'
+                color: '#fff'
               }}
             >
               {filesSelected}
             </span>
+          </div> */}
+          <div style={{
+            margin: 4,
+            width: '100%',
+            height: '100%'
+          }}>
+            <Button
+              style={{
+                backgroundColor: '#90caf9',
+                color: '#000'
+              }}
+              onClick={(e) => toggleCamera(!openCamera)}
+            >
+              Open Camera
+            </Button>
           </div>
         </div>
-      </div>
+      }
 
-    </HashRouter >
+    </div>
   );
 }
 
-export default (App);
+export default App;

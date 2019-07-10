@@ -9,13 +9,13 @@ workbox.routing.registerRoute(
 self.addEventListener('install', (e) => {
 
     e.waitUntil(new Promise((resolve) => {
-        console.log('HOOHAA');
+        console.log('Install1');
         setTimeout(resolve, 5000);
     }))
 });
 
 self.addEventListener('activate', (e) => {
-    console.log('SW2 Active');
+    console.log('SW3 Active');
 });
 
 self.addEventListener('push', (event) => {
@@ -24,6 +24,12 @@ self.addEventListener('push', (event) => {
         body: event.data.text()
     };
     event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('message', function (event) {
+    if (event.data.action === 'skipWaiting') {
+        self.skipWaiting();
+    }
 });
 
 workbox.precaching.precacheAndRoute(self.__precacheManifest);

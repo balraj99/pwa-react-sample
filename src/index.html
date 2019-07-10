@@ -3,14 +3,16 @@
 
 <head>
   <meta charset="utf-8" />
-  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="shortcut icon" href="./favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-  <link rel="manifest" href="/manifest.json" />
+  <link rel="manifest" href="./manifest.json" />
   <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -22,12 +24,13 @@
     -->
   <title>React App</title>
   <style>
+    html,
+    body {
+      height: 100%;
+    }
+
     .input-container {
-      margin: 3em auto;
       max-width: 300px;
-      background-color: #EDEDED;
-      border: 1px solid #DFDFDF;
-      border-radius: 5px;
     }
 
     input[type='file'] {
@@ -64,13 +67,59 @@
         margin: 10px 5px;
       }
     }
+
+    #snackbar {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 2px;
+      padding: 16px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+    }
+
+    #snackbar.show {
+      visibility: visible;
+      -webkit-animation: fadein 0.5s;
+      animation: fadein 0.5s;
+    }
+
+    @-webkit-keyframes fadein {
+      from {
+        bottom: 0;
+        opacity: 0;
+      }
+
+      to {
+        bottom: 30px;
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadein {
+      from {
+        bottom: 0;
+        opacity: 0;
+      }
+
+      to {
+        bottom: 30px;
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 
 <body style="font-family: Arial, Helvetica, sans-serif !important; background: #212121; color: #fff; margin: 0px; ">
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <!-- <button id="a" aria-label="Install">Hello</button> -->
-  <div id="root"></div>
+  <div id="root" align="center" style="height: 100%;"></div>
+  <div id="snackbar">A new version of this app is available. Click <a id="reload">here</a> to update.</div>
   <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

@@ -4,6 +4,8 @@
   "private": true,
   "homepage": "https://balraj99.github.io/pwa-react-sample/",
   "dependencies": {
+    "@material-ui/core": "^4.2.0",
+    "@material-ui/icons": "^4.2.1",
     "gh-pages": "^2.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -17,6 +19,7 @@
     "start": "http-server dist",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "predeploy": "webpack --mode production",
     "deploy": "gh-pages -d dist"
   },
   "eslintConfig": {
