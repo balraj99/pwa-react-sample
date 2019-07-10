@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withStyles, Fab, Button } from '@material-ui/core';
 
 const styles = () => ({
@@ -14,46 +14,76 @@ const styles = () => ({
         display: 'flex',
         width: '100%',
         height: '15%',
+        padding: 8,
         background: '#333',
         justifyContent: 'center'
     }
 });
 
-let startCamera = () => {
-    console.debug('Video', document.getElementById('player'));
+const deviceIds = [];
+
+if (navigator.mediaDevices) {
+    navigator.mediaDevices.enumerateDevices()
+        .then(function (devices) {
+            devices.forEach(function (device) {
+                console.log(device.kind + ": " + device.label +
+                    " id = " + device.deviceId);
+
+                if (device.kind == 'videoinput') {
+                    deviceIds.push(device.deviceId);
+                }
+            });
+        })
+        .catch(function (err) {
+            console.log(err.name + ": " + err.message);
+        });
+}
+
+let startCamera = (idx) => {
+
+
+
+    console.debug('Video', deviceIds[idx]);
+
+
     navigator.mediaDevices.getUserMedia({
         video: {
             width: { min: 1280 },
             height: { min: 720 },
-            facingMode: { exact: window.mobileAndTabletcheck() ? 'environment' : 'user' }
+            // facingMode: { exact: window.mobileAndTabletcheck() ? 'environment' : 'user' },
+            deviceId: deviceIds[idx]
         },
         audio: false
     }).then(stream => {
         document.getElementById('player').srcObject = stream;
-    }).catch(console.debug);
+    }).catch((error) => {
+        console.debug('Start Camera Error', error);
+    });
 };
 
 let stopCamera = () => {
     const videoEl = document.getElementById('player');
+
     if (videoEl) {
         videoEl.pause();
         const stream = videoEl.srcObject;
+
+        if (!stream) {
+            return;
+        }
         stream.getTracks()[0].stop();
     }
 }
 
 let capture = (props) => {
-    stopCamera();
-
-    console.debug('Props', props);
-
     const videoEl = document.getElementById('player');
+    const stream = videoEl.srcObject;
+    const height = stream.getTracks()[0].getSettings().height;
+    const width = stream.getTracks()[0].getSettings().width;
+
     let canvas = document.createElement('canvas');
-
-
-
-    // canvas.setAttribute('height', 1000);
-    // canvas.setAttribute('width', 1280);
+    canvas.setAttribute('height', height);
+    canvas.setAttribute('width', width);
 
     let context = canvas.getContext('2d');
 
@@ -62,15 +92,20 @@ let capture = (props) => {
 
     console.log(context.canvas.toDataURL());
 
-    props.onCapture(context.canvas.toDataURL());
+
+    const cameraEvent = Object.create({
+        width,
+        height,
+        captureDataURL: context.canvas.toDataURL()
+    });
+
+
+    props.onCapture(cameraEvent);
 
     context = null;
     canvas = null;
+    stopCamera();
 };
-
-const test = (e) => {
-    console.debug('MObile Check ', e);
-}
 
 const Camera = (props) => {
     const {
@@ -78,8 +113,13 @@ const Camera = (props) => {
     } = props;
 
     useEffect(() => {
-        startCamera();
+        stopCamera();
+        startCamera(idx);
     });
+
+    const [idx, inc] = useState(0);
+
+    // console.log('IDX ', idx)
 
     // const [cameraView, setCameraView] = useState('environment');
 
@@ -102,11 +142,19 @@ const Camera = (props) => {
             <div className={classes.cameraActions}>
                 <Fab
                     style={{
-                        margin: 8,
                         backgroundColor: '#90caf9',
                     }}
                     onClick={(e) => capture(props)}
                 >
+                </Fab>
+                <Fab
+                    style={{
+                        color: '#000',
+                        backgroundColor: 'yellow',
+                    }}
+                    onClick={() => { inc((idx + 1) % deviceIds.length) }}
+                >
+                    TC
                 </Fab>
             </div>
 

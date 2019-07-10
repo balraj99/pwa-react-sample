@@ -29,7 +29,7 @@ const App = (props) => {
 
   const [filesSelected, updateFiles] = useState('Upload Files');
   const [openCamera, toggleCamera] = useState(false);
-  const [captureDataURL, updateCaptureDataURL] = useState(null);
+  const [cameraEvent, updateCaptureDataURL] = useState(null);
 
   const {
     classes
@@ -61,8 +61,9 @@ const App = (props) => {
         </header>
       </div>
       {
-        !captureDataURL && !openCamera && (
+        !cameraEvent && !openCamera && (
           <div style={{
+            maxWidth: '500px',
             width: '100%',
             height: '400px',
             background: 'transparent',
@@ -73,9 +74,13 @@ const App = (props) => {
           </div>
         )
       }
-      {captureDataURL && !openCamera && (
+      {cameraEvent && !openCamera && (
         <img
-          src={captureDataURL}
+          style={{
+            height: Math.min(cameraEvent.height, Math.min(540, window.innerHeight)),
+            width: Math.min(cameraEvent.width, window.innerWidth)
+          }}
+          src={cameraEvent.captureDataURL}
           alt={'Image'}
         />)
       }
@@ -84,7 +89,7 @@ const App = (props) => {
           width: '100%',
           'height': openCamera ? '100%' : '70%'
         }}>
-          <Camera onCapture={(captureDataURL) => { updateCaptureDataURL(captureDataURL); toggleCamera(!openCamera) }} />
+          <Camera onCapture={(cameraEvent) => { updateCaptureDataURL(cameraEvent); toggleCamera(!openCamera) }} />
         </div>
         :
         <div style={{
