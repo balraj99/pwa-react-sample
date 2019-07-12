@@ -131,6 +131,22 @@ const App = (props) => {
             >
               Open Camera
             </Button>
+            {cameraEvent && cameraEvent.captureDataURL && (
+              <a
+                href={cameraEvent.captureDataURL}
+                download
+              >
+                <Button
+                  style={{
+                    backgroundColor: 'green',
+                    color: '#000'
+                  }}
+                  onClick={(e) => { }}
+                >
+                  Download Image
+            </Button>
+              </a>)
+            }
           </div>
         </div>
       }

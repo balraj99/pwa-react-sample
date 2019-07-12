@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { withStyles, Fab, Button } from '@material-ui/core';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import { PhotoLibrary } from '@material-ui/icons';
 
-const styles = () => ({
+const styles = (theme) => ({
     root: {
         background: 'transparent',
         width: '100%',
@@ -13,10 +16,19 @@ const styles = () => ({
     cameraActions: {
         display: 'flex',
         width: '100%',
-        height: '15%',
-        padding: 8,
+        height: '20%',
         background: '#333',
+        justifyContent: 'center',
+
+    },
+    flexContainer: {
         justifyContent: 'center'
+    },
+    captureFab: {
+        backgroundColor: '#90caf9',
+        [theme.breakpoints.down('md')]: {
+            marginRight: '-2rem',
+        },
     }
 });
 
@@ -26,10 +38,12 @@ if (navigator.mediaDevices) {
     navigator.mediaDevices.enumerateDevices()
         .then(function (devices) {
             devices.forEach(function (device) {
-                console.log(device.kind + ": " + device.label +
-                    " id = " + device.deviceId);
+
+                // console.log(device.kind + ": " + device.label +
+                //     " id = " + device.deviceId);
 
                 if (device.kind == 'videoinput') {
+                    console.debug('Specs ', device, device.getCapabilities());
                     deviceIds.push(device.deviceId);
                 }
             });
@@ -48,9 +62,9 @@ let startCamera = (idx) => {
 
     navigator.mediaDevices.getUserMedia({
         video: {
-            width: { min: 1280 },
-            height: { min: 720 },
-            // facingMode: { exact: window.mobileAndTabletcheck() ? 'environment' : 'user' },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            facingMode: { exact: window.mobileAndTabletcheck() ? 'environment' : 'user' },
             deviceId: deviceIds[idx]
         },
         audio: false
@@ -71,6 +85,7 @@ let stopCamera = () => {
         if (!stream) {
             return;
         }
+        console.debug(stream.getTracks()[0].getCapabilities());
         stream.getTracks()[0].stop();
     }
 }
@@ -122,12 +137,18 @@ const Camera = (props) => {
     // console.log('IDX ', idx)
 
     // const [cameraView, setCameraView] = useState('environment');
+    const [value, setValue] = useState(0);
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
     return (
         <div className={classes.root}>
             <div style={{
                 width: '100%',
-                height: '75%'
+                minHeight: '65%',
+                background: '#FFF'
             }}>
                 <video
                     id="player"
@@ -140,13 +161,34 @@ const Camera = (props) => {
                 />
             </div>
             <div className={classes.cameraActions}>
-                <Fab
-                    style={{
-                        backgroundColor: '#90caf9',
-                    }}
-                    onClick={(e) => capture(props)}
-                >
-                </Fab>
+                <div style={{
+                    width: '70%',
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        classes={{
+                            flexContainer: classes.flexContainer
+                        }}
+                        TabIndicatorProps={{
+                            style: {
+                                height: '0.5rem',
+                                top: 0
+                            }
+                        }}
+                    >
+                        <Tab label="Insurance" />
+                        <Tab label="Bill" />
+                        <Tab label="EOB" />
+                    </Tabs>
+                    <Fab
+                        className={classes.captureFab}
+                        onClick={(e) => capture(props)}
+                    >
+                    </Fab>
+                </div>
                 <Fab
                     style={{
                         color: '#000',
@@ -156,6 +198,17 @@ const Camera = (props) => {
                 >
                     TC
                 </Fab>
+                <div style={{
+                    width: '10%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                }}>
+                    <PhotoLibrary style={{
+                        width: '2rem',
+                        height: '2rem'
+                    }} />
+                </div>
             </div>
 
         </div>
@@ -163,4 +216,4 @@ const Camera = (props) => {
 
 }
 
-export default withStyles(styles)(Camera);
+export default withStyles(styles, { withTheme: true })(Camera);
