@@ -32,46 +32,47 @@ const styles = (theme) => ({
     }
 });
 
+const deviceSet = new Set();
 const deviceIds = [];
+const cameraTabLabels = [
+    'Insurance',
+    'Bill',
+    'EOB'
+];
 
 if (navigator.mediaDevices) {
+
     navigator.mediaDevices.enumerateDevices()
         .then(function (devices) {
             devices.forEach(function (device) {
+                let capabilities = device.getCapabilities();
+                if ((device.kind == 'videoinput') && (capabilities.facingMode && capabilities.facingMode.length > 0)) {
 
-                // console.log(device.kind + ": " + device.label +
-                //     " id = " + device.deviceId);
-
-                if (device.kind == 'videoinput') {
-                    console.debug('Specs ', device, device.getCapabilities());
-                    deviceIds.push(device.deviceId);
+                    if (!deviceSet.has(device.deviceId)) {
+                        deviceSet.add(device.deviceId);
+                        deviceIds.push(device.deviceId);
+                    }
                 }
             });
         })
         .catch(function (err) {
-            console.log(err.name + ": " + err.message);
+
         });
 }
 
 let startCamera = (idx) => {
-
-
-
-    console.debug('Video', deviceIds[idx]);
-
-
     navigator.mediaDevices.getUserMedia({
         video: {
             width: { ideal: 1920 },
             height: { ideal: 1080 },
-            facingMode: { exact: window.mobileAndTabletcheck() ? 'environment' : 'user' },
+            // facingMode: { exact: window.mobileAndTabletcheck() ? 'environment' : 'user' },
             deviceId: deviceIds[idx]
         },
         audio: false
     }).then(stream => {
         document.getElementById('player').srcObject = stream;
     }).catch((error) => {
-        console.debug('Start Camera Error', error);
+
     });
 };
 
@@ -85,7 +86,7 @@ let stopCamera = () => {
         if (!stream) {
             return;
         }
-        console.debug(stream.getTracks()[0].getCapabilities());
+
         stream.getTracks()[0].stop();
     }
 }
@@ -101,13 +102,9 @@ let capture = (props) => {
     canvas.setAttribute('width', width);
 
     let context = canvas.getContext('2d');
+    context.scale(-1, 1);
 
-    context.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
-    // context.scale(-1, 1);
-
-    console.log(context.canvas.toDataURL());
-
-
+    context.drawImage(videoEl, 0, 0, canvas.width * -1, canvas.height);
     const cameraEvent = Object.create({
         width,
         height,
@@ -122,9 +119,28 @@ let capture = (props) => {
     stopCamera();
 };
 
+const handleFiles = (e, onGalleryPickerClick) => {
+    const files = e.nativeEvent.target.files;
+    onGalleryPickerClick(files);
+
+    /**
+     * @todo May be implement no. of files picked
+     */
+    //updateFiles(`${files.length} Selected`);
+};
+
+const handleClick = (e) => {
+    const inputEl = document.getElementById('real-input');
+
+    if (inputEl) {
+        inputEl.click();
+    }
+}
+
 const Camera = (props) => {
     const {
-        classes
+        classes,
+        onGalleryPickerClick
     } = props;
 
     useEffect(() => {
@@ -134,7 +150,7 @@ const Camera = (props) => {
 
     const [idx, inc] = useState(0);
 
-    // console.log('IDX ', idx)
+    // 
 
     // const [cameraView, setCameraView] = useState('environment');
     const [value, setValue] = useState(0);
@@ -147,8 +163,8 @@ const Camera = (props) => {
         <div className={classes.root}>
             <div style={{
                 width: '100%',
-                minHeight: '65%',
-                background: '#FFF'
+                height: '70%',
+                background: 'transparent'
             }}>
                 <video
                     id="player"
@@ -156,7 +172,8 @@ const Camera = (props) => {
                     style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover'
+                        objectFit: 'cover',
+                        transform: 'scale(-1, 1)'
                     }}
                 />
             </div>
@@ -175,13 +192,21 @@ const Camera = (props) => {
                         TabIndicatorProps={{
                             style: {
                                 height: '0.5rem',
-                                top: 0
+                                top: 0,
+                                backgroundColor: '#FFF'
                             }
                         }}
                     >
-                        <Tab label="Insurance" />
-                        <Tab label="Bill" />
-                        <Tab label="EOB" />
+                        {
+                            cameraTabLabels.map((label, indexKey) => {
+                                return (
+                                    <Tab
+                                        label={label}
+                                        key={indexKey}
+                                    />
+                                )
+                            })
+                        }
                     </Tabs>
                     <Fab
                         className={classes.captureFab}
@@ -189,25 +214,40 @@ const Camera = (props) => {
                     >
                     </Fab>
                 </div>
-                <Fab
-                    style={{
-                        color: '#000',
-                        backgroundColor: 'yellow',
-                    }}
-                    onClick={() => { inc((idx + 1) % deviceIds.length) }}
-                >
-                    TC
-                </Fab>
+                {deviceIds.length > 1 && (
+                    <Fab
+                        style={{
+                            color: '#000',
+                            backgroundColor: 'yellow',
+                        }}
+                        onClick={() => { inc((idx + 1) % deviceIds.length) }}
+                    >
+                        TC
+                    </Fab>
+                )}
                 <div style={{
                     width: '10%',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center'
                 }}>
-                    <PhotoLibrary style={{
-                        width: '2rem',
-                        height: '2rem'
-                    }} />
+                    <input
+                        type={"file"}
+                        id={"real-input"}
+                        accept={"application/pdf, image/*"}
+                        onChange={(e) => handleFiles(e, onGalleryPickerClick)}
+                        style={{
+                            display: 'none'
+                        }}
+                    />
+                    <PhotoLibrary
+                        style={{
+                            width: '2rem',
+                            height: '2rem',
+                            cursor: 'pointer'
+                        }}
+                        onClick={handleClick}
+                    />
                 </div>
             </div>
 

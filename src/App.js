@@ -1,7 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { startInstallProcess } from './install';
-import { HashRouter, Route, Link } from "react-router-dom";
 import Camera from './Camera';
 import { Button } from '@material-ui/core';
 
@@ -16,18 +15,37 @@ const styles = {
   }
 }
 
-const handleFiles = e => (updateFiles) => {
-  const files = e.nativeEvent.target.files;
-  updateFiles(`${files.length} Selected`);
-};
-
 const App = (props) => {
 
+  const onGalleryPickerClick = (files) => {
+
+    /**
+     * @todo: Post the file using some service 
+     */
+
+    //again following can be done in service instead here.
+    //just a demonstration of multifile upload construction of body
+    const body = new FormData();
+
+    Array.from(files).map((file, index) => {
+      body.append(`file${index}`, file);
+    });
+
+    //someService.post(body);
+
+
+    //close camera once file is picked up.
+    toggleCamera(!openCamera);
+  }
+
+  /**
+   * @todo: Implement custom 'Add to homescreen' banner
+   */
   useEffect(() => {
-    startInstallProcess();
+    // startInstallProcess();
   });
 
-  const [filesSelected, updateFiles] = useState('Upload Files');
+  // const [filesSelected, updateFiles] = useState('Upload Files');
   const [openCamera, toggleCamera] = useState(false);
   const [cameraEvent, updateCaptureDataURL] = useState(null);
 
@@ -41,25 +59,27 @@ const App = (props) => {
       background: '#212121',
       height: '100%'
     }}>
-      <div style={{
-        padding: 2,
-        background: 'rgba(0, 0, 0, 0.2)',
-        boxShadow: '0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 2px 9px 1px rgba(0, 0, 0, 0.12), 0 4px 2px -2px rgba(0, 0, 0, 0.2)'
-      }}>
-        <header>
-          <h1 style={{
-            textAlign: 'center'
-          }}>
-            <a href="/" style={{
-              textDecoration: 'none',
-              color: 'white'
+      {!openCamera && (
+        <div style={{
+          padding: 2,
+          background: 'rgba(0, 0, 0, 0.2)',
+          boxShadow: '0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 2px 9px 1px rgba(0, 0, 0, 0.12), 0 4px 2px -2px rgba(0, 0, 0, 0.2)'
+        }}>
+          <header>
+            <h1 style={{
+              textAlign: 'center'
             }}>
-              Mpowered
+              <a href="/" style={{
+                textDecoration: 'none',
+                color: 'white'
+              }}>
+                Mpowered
           </a>
-          </h1>
-          <button id="butInstall" aria-label="Install MPowered" hidden>Install MPowered</button>
-        </header>
-      </div>
+            </h1>
+            <button id="butInstall" aria-label="Install MPowered" hidden>Install MPowered</button>
+          </header>
+        </div>
+      )}
       {
         !cameraEvent && !openCamera && (
           <div style={{
@@ -77,8 +97,10 @@ const App = (props) => {
       {cameraEvent && !openCamera && (
         <img
           style={{
-            height: Math.min(cameraEvent.height, Math.min(540, window.innerHeight)),
-            width: Math.min(cameraEvent.width, window.innerWidth)
+            maxHeight: Math.min(cameraEvent.height, Math.min(540, window.innerHeight)),
+            maxWidth: Math.min(cameraEvent.width, window.innerWidth),
+            height: 'auto',
+            width: 'auto'
           }}
           src={cameraEvent.captureDataURL}
           alt={'Image'}
@@ -89,7 +111,10 @@ const App = (props) => {
           width: '100%',
           'height': openCamera ? '100%' : '70%'
         }}>
-          <Camera onCapture={(cameraEvent) => { updateCaptureDataURL(cameraEvent); toggleCamera(!openCamera) }} />
+          <Camera
+            onCapture={(cameraEvent) => { updateCaptureDataURL(cameraEvent); toggleCamera(!openCamera) }}
+            onGalleryPickerClick={onGalleryPickerClick}
+          />
         </div>
         :
         <div style={{
@@ -99,24 +124,6 @@ const App = (props) => {
           height: '15%'
         }}
         >
-          {/* <div class="input-container">
-            <input type="file" id="real-input" onChange={(e) => handleFiles(e, updateFiles)} />
-            <button
-              class="browse-btn"
-              onClick={handleFiles(updateFiles)}
-            >
-              Browse Files
-            </button>
-            <span
-              class="file-info"
-              style={{
-                padding: 4,
-                color: '#fff'
-              }}
-            >
-              {filesSelected}
-            </span>
-          </div> */}
           <div style={{
             margin: 4,
             width: '100%',
@@ -127,7 +134,7 @@ const App = (props) => {
                 backgroundColor: '#90caf9',
                 color: '#000'
               }}
-              onClick={(e) => toggleCamera(!openCamera)}
+              onClick={(e) => { updateCaptureDataURL(null); toggleCamera(!openCamera); }}
             >
               Open Camera
             </Button>
