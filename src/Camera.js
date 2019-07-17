@@ -25,10 +25,46 @@ const styles = (theme) => ({
         justifyContent: 'center'
     },
     captureFab: {
-        backgroundColor: '#90caf9',
+        backgroundColor: '#FFF',
         [theme.breakpoints.down('md')]: {
             marginRight: '-2rem',
         },
+    },
+    videoContainer: {
+        width: '100%',
+        height: '70%',
+        background: 'transparent'
+    },
+    camera: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        transform: 'scale(-1, 1)'
+    },
+    cameraTabsContainer: {
+        width: '70%',
+        display: 'flex',
+        flexDirection: 'column'
+    },
+    cameraTabIndicatorOvr: {
+        height: '0.5rem',
+        top: 0,
+        backgroundColor: '#FFF'
+    },
+    toggleFab: {
+        color: '#000',
+        backgroundColor: 'yellow',
+    },
+    galleryPickerContainer: {
+        width: '10%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
+    },
+    galleryPickerIcon: {
+        width: '2rem',
+        height: '2rem',
+        cursor: 'pointer'
     }
 });
 
@@ -146,13 +182,13 @@ const Camera = (props) => {
     useEffect(() => {
         stopCamera();
         startCamera(idx);
-    });
+
+        return () => {
+            stopCamera();
+        }
+    }, []);
 
     const [idx, inc] = useState(0);
-
-    // 
-
-    // const [cameraView, setCameraView] = useState('environment');
     const [value, setValue] = useState(0);
 
     const handleChange = (event, newValue) => {
@@ -161,28 +197,15 @@ const Camera = (props) => {
 
     return (
         <div className={classes.root}>
-            <div style={{
-                width: '100%',
-                height: '70%',
-                background: 'transparent'
-            }}>
+            <div className={classes.videoContainer}>
                 <video
                     id="player"
                     autoPlay
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transform: 'scale(-1, 1)'
-                    }}
+                    className={classes.camera}
                 />
             </div>
             <div className={classes.cameraActions}>
-                <div style={{
-                    width: '70%',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}>
+                <div className={classes.cameraTabsContainer}>
                     <Tabs
                         value={value}
                         onChange={handleChange}
@@ -190,11 +213,7 @@ const Camera = (props) => {
                             flexContainer: classes.flexContainer
                         }}
                         TabIndicatorProps={{
-                            style: {
-                                height: '0.5rem',
-                                top: 0,
-                                backgroundColor: '#FFF'
-                            }
+                            className: classes.cameraTabIndicatorOvr
                         }}
                     >
                         {
@@ -216,21 +235,13 @@ const Camera = (props) => {
                 </div>
                 {deviceIds.length > 1 && (
                     <Fab
-                        style={{
-                            color: '#000',
-                            backgroundColor: 'yellow',
-                        }}
+                        className={classes.toggleFab}
                         onClick={() => { inc((idx + 1) % deviceIds.length) }}
                     >
                         TC
                     </Fab>
                 )}
-                <div style={{
-                    width: '10%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center'
-                }}>
+                <div className={classes.galleryPickerContainer}>
                     <input
                         type={"file"}
                         id={"real-input"}
@@ -241,16 +252,11 @@ const Camera = (props) => {
                         }}
                     />
                     <PhotoLibrary
-                        style={{
-                            width: '2rem',
-                            height: '2rem',
-                            cursor: 'pointer'
-                        }}
+                        className={classes.galleryPickerIcon}
                         onClick={handleClick}
                     />
                 </div>
             </div>
-
         </div>
     );
 

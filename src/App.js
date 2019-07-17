@@ -4,18 +4,44 @@ import { startInstallProcess } from './install';
 import Camera from './Camera';
 import { Button } from '@material-ui/core';
 
-const theme = {
-  background: "#f7df1e",
-  color: "#24292e"
-};
-
 const styles = {
   root: {
     background: '#000'
   }
 }
 
+
+
 const App = (props) => {
+
+  const rotateImage = (direction) => {
+    const imgEl = document.getElementById('captured-img');
+    let canvas = document.createElement('canvas');
+
+    const degrees = direction === 'acl' ? -90 : 90;
+
+    console.debug('DIM', imgEl.height, imgEl.width);
+
+    canvas.setAttribute('height', imgEl.width);
+    canvas.setAttribute('width', imgEl.height);
+
+    let context = canvas.getContext('2d');
+    context.translate(canvas.width / 2, canvas.height / 2);
+    context.rotate(degrees * Math.PI / 180);
+    context.drawImage(imgEl, -imgEl.width / 2, -imgEl.height / 2);
+    context.rotate(-degrees * Math.PI / 180);
+    context.translate(-canvas.width / 2, -canvas.height / 2);
+
+    updateCaptureDataURL({
+      width: imgEl.height,
+      height: imgEl.width,
+      captureDataURL: context.canvas.toDataURL()
+    })
+  }
+
+  const handleRotate = (e) => {
+
+  };
 
   const onGalleryPickerClick = (files) => {
 
@@ -32,8 +58,6 @@ const App = (props) => {
     });
 
     //someService.post(body);
-
-
     //close camera once file is picked up.
     toggleCamera(!openCamera);
   }
@@ -95,16 +119,35 @@ const App = (props) => {
         )
       }
       {cameraEvent && !openCamera && (
-        <img
-          style={{
-            maxHeight: Math.min(cameraEvent.height, Math.min(540, window.innerHeight)),
-            maxWidth: Math.min(cameraEvent.width, window.innerWidth),
-            height: 'auto',
-            width: 'auto'
-          }}
-          src={cameraEvent.captureDataURL}
-          alt={'Image'}
-        />)
+        <div>
+          <img
+            style={{
+              // maxHeight: Math.min(cameraEvent.height, Math.min(540, window.innerHeight)),
+              // maxWidth: Math.min(cameraEvent.width, window.innerWidth),
+              height: cameraEvent.height,
+              width: cameraEvent.width,
+              overflow: 'auto',
+              display: 'none'
+            }}
+            id={"captured-img"}
+            src={cameraEvent.captureDataURL}
+            alt={'Image'}
+
+          />
+          <img
+            style={{
+              maxHeight: Math.min(cameraEvent.height, Math.min(540, window.innerHeight)),
+              maxWidth: Math.min(cameraEvent.width, window.innerWidth),
+              height: 'auto',
+              width: 'auto',
+              overflow: 'auto'
+            }}
+            // id={"captured-img"}
+            src={cameraEvent.captureDataURL}
+            alt={'Image'}
+          />
+        </div>
+      )
       }
       {openCamera ?
         <div style={{
@@ -139,21 +182,31 @@ const App = (props) => {
               Open Camera
             </Button>
             {cameraEvent && cameraEvent.captureDataURL && (
-              <a
-                href={cameraEvent.captureDataURL}
-                download
-              >
+              // <a
+              //   href={cameraEvent.captureDataURL}
+              //   download
+              // >
+              <div>
                 <Button
                   style={{
                     backgroundColor: 'green',
                     color: '#000'
                   }}
-                  onClick={(e) => { }}
+                  onClick={() => rotateImage('cl')}
                 >
-                  Download Image
-            </Button>
-              </a>)
-            }
+                  Rotate Right
+                </Button>
+                <Button
+                  style={{
+                    backgroundColor: 'green',
+                    color: '#000'
+                  }}
+                  onClick={() => rotateImage('acl')}
+                >
+                  Rotate Left
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       }
